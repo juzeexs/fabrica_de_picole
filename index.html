@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página inicial - Fábrica de Picolés</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Fundo com partículas */
+        #particles-js {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Cabeçalho */
+        header {
+            display: flex;
+            justify-content: space-evenly;
+            align-items: center;
+            padding: 35px 30px 60px 0px;
+            color: white;
+
+            position: relative;
+            z-index: 10;
+        }
+
+        .header-content-left {
+            display: flex;
+            align-items: center;
+            gap: 120px;
+        }
+
+        header img {
+            height: 110px;
+        }
+
+        nav a {
+            color: #9b9ca2;
+            text-decoration: none;
+            margin: 0 10px;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: #ee3540;
+        }
+
+        .header-content-right {
+            display: flex;
+            gap: 20px;
+        }
+
+        .header-content-right a {
+            color: black;
+            text-decoration: none;
+            font-weight: bold;
+            padding: 5px 12px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .header-content-right a:hover {
+
+            color: black;
+        }
+
+        .button-of {
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            width: 130px;
+            padding: 13px 25px;
+            border: 2px solid black;
+            border-radius: 18px;
+            font-family: "Quicksand", Sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            text-transform: none;
+            line-height: 20px;
+        }
+
+        .button-strong {
+            display: flex;
+            padding: 15px 26px 15px 26px;
+            background-color: #ed1c24;
+            border-radius: 18px;
+            border: none;
+            font-family: "Quicksand", Sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            text-transform: none;
+            line-height: 20px;
+        }
+
+        .button-strong a {
+            color: white;
+        }
+
+        .linguage {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .linguage-content {
+            font-family: Quicksand;
+            font-size: 17px;
+            font-weight: 500 !important;
+            line-height: 21px;
+            letter-spacing: 0em;
+            text-align: left;
+            color: black;
+        }
+        .nav{
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav a {
+            font-size: 16px;
+            font: bold;
+            color: #9497A2;
+            font-family: "Quicksand", Sans-serif;
+
+            font-weight: 700;
+            text-transform: capitalize;
+            line-height: 20px;
+        }
+
+        .seta {
+            display: inline-block;
+            height: 24px;
+            width: 15px;
+            vertical-align: middle;
+            background-image: url(data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 285 285'><path d='M282 76.5l-14.2-14.3a9 9 0 0 0-13.1 0L142.5 174.4 30.3 62.2a9 9 0 0 0-13.2 0L3 76.5a9 9 0 0 0 0 13.1l133 133a9 9 0 0 0 13.1 0l133-133a9 9 0 0 0 0-13z' style='fill:%23666'/></svg>);
+            background-position: 50%;
+            background-size: 11px;
+            background-repeat: no-repeat;
+            transition: all .3s;
+            transform: rotate(-180deg);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="particles-js"></div>
+
+    <header>
+        <div class="header-content-left">
+            <img src="/fabrica_de_picoles/assets/image-1.png.webp" alt="Logo da Fábrica de Picolés">
+            <nav class="nav">
+                <a href="#">Home</a>
+                <a href="#">Sobre</a>
+                <a href="#">Sustentabilidade</a>
+                <a href="#">Produtos</a>
+                <a href="#">Onde procurar</a>
+            </nav>
+        </div>
+
+        <div class="header-content-right">
+            <div class="linguage">
+
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                    <path
+                        d="M15.5234 10.625C16.117 8.92534 16.117 7.07466 15.5234 5.375L15.4999 5.3125C14.9453 3.76777 13.9272 2.43197 12.5848 1.48764C11.2424 0.543306 9.64119 0.0365143 7.99991 0.0365143C6.35864 0.0365143 4.75739 0.543306 3.41499 1.48764C2.07259 2.43197 1.05453 3.76777 0.499915 5.3125L0.476477 5.375C-0.117159 7.07466 -0.117159 8.92534 0.476477 10.625L0.499915 10.6875C1.05372 12.2325 2.07109 13.5689 3.413 14.5139C4.75491 15.4589 6.35589 15.9665 7.99717 15.9674C9.63845 15.9682 11.24 15.4623 12.5828 14.5187C13.9257 13.575 14.9445 12.2398 15.4999 10.6953L15.5234 10.625ZM5.78898 10.9687H10.2109C9.76554 12.3984 9.00773 13.6797 7.99991 14.6641C6.9921 13.6797 6.23429 12.3984 5.78898 10.9687ZM5.5546 10.0312C5.27327 8.6917 5.27327 7.3083 5.5546 5.96875H10.4452C10.7266 7.3083 10.7266 8.6917 10.4452 10.0312H5.5546ZM0.968665 8C0.967036 7.31199 1.06708 6.62752 1.26554 5.96875H4.59367C4.34361 7.31137 4.34361 8.68863 4.59367 10.0312H1.26554C1.06708 9.37248 0.967036 8.68801 0.968665 8ZM10.2109 5.03125H5.78898C6.23429 3.60156 6.9921 2.32031 7.99991 1.33594C9.00773 2.32031 9.76554 3.60156 10.2109 5.03125ZM11.414 5.96875H14.7343C15.1303 7.29396 15.1303 8.70604 14.7343 10.0312H11.414C11.6536 8.68768 11.6536 7.31232 11.414 5.96875ZM14.3749 5.03125H11.1952C10.7946 3.54917 10.0476 2.18352 9.01554 1.04688C10.1689 1.21535 11.2624 1.6676 12.1978 2.36304C13.1332 3.05847 13.8813 3.97531 14.3749 5.03125ZM6.98429 1.04688C5.95227 2.18352 5.20518 3.54917 4.8046 5.03125H1.62491C2.11851 3.97531 2.86659 3.05847 3.80202 2.36304C4.73744 1.6676 5.83092 1.21535 6.98429 1.04688ZM1.62491 10.9687H4.8046C5.20681 12.4525 5.95363 13.8203 6.98429 14.9609C5.83105 14.789 4.73823 14.3345 3.80316 13.638C2.86809 12.9415 2.11979 12.0245 1.62491 10.9687ZM9.01554 14.9609C10.0462 13.8203 10.793 12.4525 11.1952 10.9687H14.3749C13.88 12.0245 13.1317 12.9415 12.1967 13.638C11.2616 14.3345 10.1688 14.789 9.01554 14.9609Z"
+                        fill="black"></path>
+                </svg>
+                <span class="linguage-content">PT</span>
+                <span class="seta"></span>
+
+            </div>
+            <span class="button-of"><a href="/fabrica_de_picoles/cadastro.html">Cadastro</a></span>
+            <span class="button-strong"><a href="/fabrica_de_picoles/criar_conta.html">Criar Conta</a></span>
+        </div>
+    </header>
+
+    <!-- Script das partículas -->
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <script>
+        particlesJS("particles-js", {
+            "particles": {
+                "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#ffffff" },
+                "shape": { "type": "circle" },
+                "opacity": { "value": 0.5 },
+                "size": { "value": 3 },
+                "line_linked": {
+                    "enable": true,
+                    "distance": 150,
+                    "color": "#ffffff",
+                    "opacity": 0.4,
+                    "width": 1
+                },
+                "move": { "enable": true, "speed": 2, "direction": "none", "out_mode": "out" }
+            },
+            "interactivity": {
+                "detect_on": "canvas",
+                "events": {
+                    "onhover": { "enable": true, "mode": "repulse" },
+                    "onclick": { "enable": true, "mode": "push" }
+                },
+                "modes": {
+                    "repulse": { "distance": 30 },
+                    "push": { "particles_nb": 4 }
+                }
+            },
+            "retina_detect": true
+        });
+    </script>
+</body>
+
+</html>
