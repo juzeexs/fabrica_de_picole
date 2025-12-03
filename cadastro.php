@@ -1,39 +1,21 @@
 <?php
-$server = "localhost";
-$usuario = "root";
-$senha = "";
-$banco = "meusistema";
+include 'db_config.php';
 
-// cria a conexão
-$conn = new mysqli($server, $usuario, $senha, $banco);
-
-// verifica conexão
-if ($conn->connect_error) {
-    die("Falha ao se comunicar com o banco de dados: " . $conn->connect_error);
-}
+// Verifica se a conexão foi bem-sucedida (já feito em db_config.php)
 
 // verifica se o formulário foi enviado
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    
+    // Validação básica
+    if (empty($_POST['nome']) || empty($_POST['email']) || empty($_POST['senha']) || empty($_POST['colaborador'])) {
+        echo "Erro: Todos os campos são obrigatórios.";
+        exit();
+    }
 
-    $nome  = $_POST['nome'] ?? '';
-    $email = $_POST['email'] ?? '';
-    $senha = $_POST['senha'] ?? '';
-    $tipodecolaborador = $_POST['colaborador'] ?? '';
-    $tipodecolaborador = strtolower($tipodecolaborador); 
-    $tipodecolaborador = str_replace('á', 'a', $tipodecolaborador);
-$tipodecolaborador = str_replace('é', 'e', $tipodecolaborador);
-$tipodecolaborador = str_replace('í', 'i', $tipodecolaborador);
-$tipodecolaborador = str_replace('ó', 'o', $tipodecolaborador);
-$tipodecolaborador = str_replace('ú', 'u', $tipodecolaborador);
-$tipodecolaborador = str_replace('ã', 'a', $tipodecolaborador);
-$tipodecolaborador = str_replace('õ', 'o', $tipodecolaborador);
-$tipodecolaborador = str_replace('ç', 'c', $tipodecolaborador);
-$tipodecolaborador = str_replace('â', 'a', $tipodecolaborador);
-$tipodecolaborador = str_replace('ê', 'e', $tipodecolaborador);
-$tipodecolaborador = str_replace('ô', 'o', $tipodecolaborador);
-// Para o seu caso, se for apenas 'Usuário', o principal é:
-$tipodecolaborador = str_replace('uário', 'uario', $tipodecolaborador); // Simplificação
-$tipodecolaborador = str_replace('á', 'a', $tipodecolaborador); // Se for 'Usuário'
+    $nome  = trim($_POST['nome']);
+    $email = trim($_POST['email']);
+    $senha = $_POST['senha'];
+    $tipodecolaborador = trim($_POST['colaborador']);
 
     // criptografa a senha
     $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
@@ -52,8 +34,9 @@ $tipodecolaborador = str_replace('á', 'a', $tipodecolaborador); // Se for 'Usu�
 
     if ($stmt->execute()) {
 
-        // redireciona após cadastrar com sucesso
-        header("Location: obrigado.html");
+        // Redireciona após cadastrar com sucesso
+        // Adiciona um parâmetro de sucesso para evitar reenvio do formulário
+        header("Location: obrigado.html?status=success");
         exit();
     } else {
         echo "Erro ao cadastrar: " . $stmt->error;

@@ -1,0 +1,455 @@
+<?php
+include 'check_session.php';
+check_session('logistica'); // Apenas 'logistica' pode acessar esta página
+?>
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard Logística - Picolés</title>
+  <style>
+    :root{
+      --bg:#0b0b0b;
+      --card:#0f0f0f;
+      --accent:#d32f2f; /* red */
+      --muted:#9a9a9a;
+      --glass: rgba(255,255,255,0.03);
+      --success: #2ecc71;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial;color:#eee;background:linear-gradient(180deg,#060606 0%, #0e0e0e 100%)}
+
+    .app{display:grid;grid-template-columns:260px 1fr;gap:20px;min-height:100vh;padding:28px}
+    .sidebar{background:linear-gradient(180deg, rgba(211,47,47,0.06), rgba(0,0,0,0.3));border-radius:14px;padding:18px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 6px 20px rgba(0,0,0,0.6)}
+    .brand{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+    .logo{width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--accent),#700000);display:flex;align-items:center;justify-content:center;font-weight:700}
+    .brand h1{font-size:16px;margin:0}
+    .nav{margin-top:8px}
+    .nav button{display:block;width:100%;text-align:left;padding:10px;border-radius:8px;background:transparent;border:none;color:var(--muted);margin-bottom:6px;cursor:pointer}
+    .nav button.active, .nav button:hover{background:linear-gradient(90deg,rgba(211,47,47,0.12), rgba(0,0,0,0.2));color:#fff}
+
+    .search{display:flex;gap:8px;margin:12px 0}
+    .search input{flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#fff}
+
+    .main{padding:18px;border-radius:14px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 30px rgba(0,0,0,0.6)}
+    .header{display:flex;justify-content:space-between;align-items:center}
+    .stats{display:flex;gap:12px;margin:18px 0}
+    .card{background:var(--card);padding:14px;border-radius:12px;flex:1;border:1px solid rgba(255,255,255,0.03)}
+    .card h3{margin:0 0 8px 0;font-size:13px;color:var(--muted)}
+    .big{font-size:24px;font-weight:700}
+
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .full{grid-column:1/-1}
+
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:8px;text-align:left;border-bottom:1px dashed rgba(255,255,255,0.03);font-size:13px}
+    th{color:var(--muted);font-weight:600}
+
+    .btn{display:inline-flex;gap:8px;align-items:center;padding:8px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:linear-gradient(90deg,var(--accent),#8b0000);color:#fff;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+
+    form{display:flex;flex-direction:column;gap:8px}
+    input,select{padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#fff}
+
+    /* small screens */
+    @media (max-width:900px){.app{grid-template-columns:1fr;padding:12px}.grid{grid-template-columns:1fr}.sidebar{order:2}.main{order:1}}
+
+    /* little badges */
+    .badge{padding:4px 8px;border-radius:999px;font-size:12px;background:rgba(255,255,255,0.04);color:var(--muted)}
+
+    /* temperature indicator */
+    .temp{display:flex;gap:8px;align-items:center}
+    .thermo{width:10px;height:40px;border-radius:6px;background:linear-gradient(180deg,var(--accent),#ff7b7b);position:relative}
+    .thermo span{position:absolute;left:14px;font-size:13px}
+
+    .row{display:flex;gap:12px}
+    .col{flex:1}
+
+    .muted{color:var(--muted)}
+
+    footer{margin-top:18px;text-align:center;color:var(--muted);font-size:13px}
+
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo">P</div>
+        <div>
+          <h1>Logística Picolés</h1>
+          <div class="muted" style="font-size:12px">Painel operacional</div>
+        </div>
+      </div>
+
+      <div class="search">
+        <input id="globalSearch" placeholder="Pesquisar... (produto, rota, veículo)" />
+        <button class="btn ghost" id="addQuick">+Novo</button>
+      </div>
+
+      <nav class="nav">
+        <button class="active" data-view="dashboard">Dashboard</button>
+        <button data-view="estoque">Estoque</button>
+        <button data-view="pedidos">Pedidos</button>
+        <button data-view="veiculos">Veiculos</button>
+        <button data-view="rotas">Rotas</button>
+        <button data-view="fornecedores">Fornecedores</button>
+        <button data-view="planejamento">Planejamento</button>
+      </nav>
+
+      <div style="margin-top:18px">
+        <div class="muted" style="font-size:12px">Modo</div>
+        <div style="margin-top:6px">
+          <span class="badge">Temperatura ideal: -18°C</span>
+        </div>
+      </div>
+      <div style="margin-top: 30px;">
+        <a href="logout.php" class="btn" style="width: 100%; text-align: center; text-decoration: none;">Sair</a>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="header">
+        <div>
+          <h2 style="margin:0">Dashboard operacional</h2>
+          <div class="muted">Visão geral das funcionalidades de logística para picolés</div>
+        </div>
+        <div class="row">
+          <div style="margin-right:12px" class="muted">Usuário: <?php echo htmlspecialchars($_SESSION['usuario_email']); ?></div>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="card">
+          <h3>Produtos em estoque</h3>
+          <div class="big" id="stockCount">0</div>
+          <div class="muted">Itens prontos para envio</div>
+        </div>
+        <div class="card">
+          <h3>Pedidos ativos</h3>
+          <div class="big" id="ordersCount">0</div>
+          <div class="muted">Expedições a realizar</div>
+        </div>
+        <div class="card">
+          <h3>Veículos ativos</h3>
+          <div class="big" id="vehiclesCount">0</div>
+          <div class="muted">Câmaras e temperatura</div>
+        </div>
+      </div>
+
+      <div class="grid">
+        
+
+        <section class="card" id="estoque" style="display:none">
+          <h3>Estoque & Inventário</h3>
+          <div class="row">
+            <div class="col">
+              <table>
+                <thead><tr><th>Produto</th><th>Qtd</th><th>Validade</th><th>Ações</th></tr></thead>
+                <tbody id="stockTable"></tbody>
+              </table>
+            </div>
+            <div style="width:320px">
+              <h4>Adicionar produto</h4>
+              <form id="addProductForm">
+                <input name="name" placeholder="Nome do produto (ex: Picolé Morango)" required />
+                <input name="qty" type="number" placeholder="Quantidade" value="100" required />
+                <input name="expiry" type="date" required />
+                <button class="btn" type="submit">Adicionar</button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" id="pedidos" style="display:none">
+          <h3>Pedidos / Expedição</h3>
+          <div class="row">
+            <div class="col">
+              <table>
+                <thead><tr><th>Cliente</th><th>Itens</th><th>Status</th><th>Ações</th></tr></thead>
+                <tbody id="ordersTable"></tbody>
+              </table>
+            </div>
+            <div style="width:320px">
+              <h4>Criar pedido</h4>
+              <form id="createOrderForm">
+                <input name="cliente" placeholder="Nome do cliente" required />
+                <select name="produto" id="orderProduto"></select>
+                <input name="qt" type="number" value="20" required />
+                <input name="address" placeholder="Endereço / ponto de entrega" required />
+                <button class="btn" type="submit">Gerar Pedido</button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" id="veiculos" style="display:none">
+          <h3>Veículos & Monitoramento</h3>
+          <div class="row">
+            <div class="col">
+              <table>
+                <thead><tr><th>ID</th><th>Placa</th><th>Temp (°C)</th><th>Status</th><th>Ações</th></tr></thead>
+                <tbody id="vehiclesTable"></tbody>
+              </table>
+            </div>
+            <div style="width:320px">
+              <h4>Adicionar veículo</h4>
+              <form id="addVehicleForm">
+                <input name="placa" placeholder="Placa" required />
+                <input name="capacity" type="number" placeholder="Capacidade (qtd)" value="1000" required />
+                <input name="temp" type="number" step="0.1" placeholder="Temperatura atual" value="-18" required />
+                <button class="btn" type="submit">Adicionar veículo</button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" id="rotas" style="display:none">
+          <h3>Rotas & Distribuição</h3>
+          <div class="row">
+            <div class="col">
+              <h4>Pontos de entrega</h4>
+              <table>
+                <thead><tr><th>Pedido</th><th>Endereço</th><th>Cliente</th><th>Ações</th></tr></thead>
+                <tbody id="routeTable"></tbody>
+              </table>
+              <div style="margin-top:8px"><button class="btn" id="planRoute">Planejar rota ótima</button></div>
+            </div>
+            <div style="width:320px">
+              <h4>Simular entrega</h4>
+              <div class="muted">Escolha veículo e execute simulação</div>
+              <select id="simVehicle"></select>
+              <button class="btn" id="runSim">Iniciar simulação</button>
+              <div style="margin-top:12px" id="simLog" class="muted"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" id="fornecedores" style="display:none">
+          <h3>Fornecedores & Insumos</h3>
+          <div class="row">
+            <div class="col">
+              <table>
+                <thead><tr><th>Nome</th><th>Contato</th><th>Insumo Principal</th><th>Ações</th></tr></thead>
+                <tbody id="supplierTable"></tbody>
+              </table>
+            </div>
+            <div style="width:320px">
+              <h4>Adicionar fornecedor</h4>
+              <form id="addSupplierForm">
+                <input name="name" placeholder="Nome do fornecedor" required />
+                <input name="contact" placeholder="Contato (email/tel)" required />
+                <input name="item" placeholder="Insumo principal" required />
+                <button class="btn" type="submit">Adicionar</button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <section class="card" id="planejamento" style="display:none">
+          <h3>Planejamento de Produção</h3>
+          <div class="row">
+            <div class="col">
+              <h4>Próximas metas</h4>
+              <table>
+                <thead><tr><th>Produto</th><th>Meta (unid)</th><th>Prazo</th><th>Status</th></tr></thead>
+                <tbody id="planningTable"></tbody>
+              </table>
+            </div>
+            <div style="width:320px">
+              <h4>Nova meta</h4>
+              <form id="addPlanningForm">
+                <input name="product" placeholder="Produto" required />
+                <input name="goal" type="number" placeholder="Meta (unid)" required />
+                <input name="deadline" type="date" required />
+                <button class="btn" type="submit">Definir meta</button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <footer>
+        Logística Picolés v1.0 | <a href="https://github.com/exemplo" target="_blank">Código Fonte</a>
+      </footer>
+    </main>
+  </div>
+
+  <script>
+    // Script JavaScript original (não alterado)
+    const views = ['dashboard', 'estoque', 'pedidos', 'veiculos', 'rotas', 'fornecedores', 'planejamento'];
+    const navButtons = document.querySelectorAll('.nav button');
+    const sections = document.querySelectorAll('.main section');
+
+    navButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        navButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        const view = button.getAttribute('data-view');
+        sections.forEach(section => {
+          section.style.display = section.id === view ? 'block' : 'none';
+        });
+      });
+    });
+
+    // Dados de exemplo (simulação)
+    let stock = [
+      { name: 'Picolé Morango', qty: 500, expiry: '2024-12-31' },
+      { name: 'Picolé Chocolate', qty: 300, expiry: '2024-11-30' },
+      { name: 'Picolé Limão', qty: 700, expiry: '2025-01-15' },
+    ];
+
+    let orders = [
+      { id: 1, client: 'Mercado Central', items: 150, status: 'Pendente', address: 'Rua A, 123' },
+      { id: 2, client: 'Padaria Doce', items: 80, status: 'Em Rota', address: 'Av. B, 456' },
+    ];
+
+    let vehicles = [
+      { id: 1, plate: 'ABC-1234', temp: -18.5, status: 'Livre' },
+      { id: 2, plate: 'XYZ-9876', temp: -17.9, status: 'Em Rota' },
+    ];
+
+    let suppliers = [
+      { name: 'Frutas Frescas Ltda', contact: 'frutas@email.com', item: 'Morango' },
+      { name: 'Cacau Premium S.A.', contact: 'cacau@email.com', item: 'Chocolate' },
+    ];
+
+    let planning = [
+      { product: 'Picolé Morango', goal: 1000, deadline: '2024-12-01', status: 'Em Andamento' },
+      { product: 'Picolé Limão', goal: 500, deadline: '2024-11-30', status: 'Atrasado' },
+    ];
+
+    function updateStats() {
+      document.getElementById('stockCount').textContent = stock.reduce((sum, item) => sum + item.qty, 0);
+      document.getElementById('ordersCount').textContent = orders.length;
+      document.getElementById('vehiclesCount').textContent = vehicles.length;
+    }
+
+    function renderStock() {
+      const table = document.getElementById('stockTable');
+      table.innerHTML = stock.map(item => `
+        <tr>
+          <td>${item.name}</td>
+          <td>${item.qty}</td>
+          <td>${item.expiry}</td>
+          <td><button class="btn ghost" onclick="alert('Ação de editar/remover')">Ações</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderOrders() {
+      const table = document.getElementById('ordersTable');
+      table.innerHTML = orders.map(order => `
+        <tr>
+          <td>${order.client}</td>
+          <td>${order.items}</td>
+          <td><span class="badge">${order.status}</span></td>
+          <td><button class="btn ghost" onclick="alert('Ação de ver detalhes')">Ações</button></td>
+        </tr>
+      `).join('');
+      
+      const select = document.getElementById('orderProduto');
+      select.innerHTML = stock.map(item => `<option value="${item.name}">${item.name}</option>`).join('');
+    }
+
+    function renderVehicles() {
+      const table = document.getElementById('vehiclesTable');
+      table.innerHTML = vehicles.map(v => `
+        <tr>
+          <td>${v.id}</td>
+          <td>${v.plate}</td>
+          <td>${v.temp}°C</td>
+          <td><span class="badge">${v.status}</span></td>
+          <td><button class="btn ghost" onclick="alert('Ação de monitorar')">Ações</button></td>
+        </tr>
+      `).join('');
+
+      const simSelect = document.getElementById('simVehicle');
+      simSelect.innerHTML = vehicles.map(v => `<option value="${v.id}">${v.plate} (${v.status})</option>`).join('');
+    }
+
+    function renderRoutes() {
+      const table = document.getElementById('routeTable');
+      table.innerHTML = orders.map(order => `
+        <tr>
+          <td>#${order.id}</td>
+          <td>${order.address}</td>
+          <td>${order.client}</td>
+          <td><button class="btn ghost" onclick="alert('Ação de priorizar')">Priorizar</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderSuppliers() {
+      const table = document.getElementById('supplierTable');
+      table.innerHTML = suppliers.map(s => `
+        <tr>
+          <td>${s.name}</td>
+          <td>${s.contact}</td>
+          <td>${s.item}</td>
+          <td><button class="btn ghost" onclick="alert('Ação de contato')">Contato</button></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderPlanning() {
+      const table = document.getElementById('planningTable');
+      table.innerHTML = planning.map(p => `
+        <tr>
+          <td>${p.product}</td>
+          <td>${p.goal}</td>
+          <td>${p.deadline}</td>
+          <td><span class="badge">${p.status}</span></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderTempList() {
+      const list = document.getElementById('tempList');
+      list.innerHTML = vehicles.map(v => `
+        <div class="temp" style="margin-bottom: 8px;">
+          <div class="thermo" style="height: 40px; background: linear-gradient(180deg, ${v.temp < -18 ? '#2ecc71' : '#d32f2f'}, ${v.temp < -18 ? '#1e8449' : '#8b0000'});">
+            <span style="color: #fff;">${v.temp}°C</span>
+          </div>
+          <div style="font-size: 13px;">
+            <div>Veículo ${v.plate}</div>
+            <div class="muted">${v.status}</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderActivityLog() {
+      const log = document.getElementById('activityLog');
+      log.innerHTML = `
+        <div>[10:30] Pedido #1 alterado para 'Em Rota'</div>
+        <div>[10:25] Veículo ${vehicles[1].plate} saiu para rota</div>
+        <div>[09:00] Novo lote de Picolé Limão (200 un) adicionado</div>
+      `;
+    }
+
+    function init() {
+      updateStats();
+      renderStock();
+      renderOrders();
+      renderVehicles();
+      renderRoutes();
+      renderSuppliers();
+      renderPlanning();
+      renderTempList();
+      renderActivityLog();
+    }
+
+    init();
+
+    // Adicionar funcionalidade de logout
+    document.querySelector('.sidebar a[href="logout.php"]').addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = 'logout.php';
+    });
+
+  </script>
+</body>
+</html>
